@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Webpage: Site Index Page</title>
+    <meta charset="UTF-8">
+
+</head>
+<body>
+   <p>From here we can do other things!</p>
+   <ul>
+    <li><a href="ping">ping</a> returns an HTTP okay response. Browser will load empty page. (empty body)</li>
+    <li><a href="hello">hello</a> returns a string with a hello message and what <code>Request</code> looks like.</li>
+    <li><a href="goodbye">goodbye</a> also returns just a simple string.</li>
+    <li><a href="encodable">encodable</a> returns the json of a <code>ResponseEncodable</code> object.</li>
+    <li><a href="files/somerandomghaurwghrb">files/*</a> returns a string with the uri.description</li>
+      <ul>
+        <li>but not if there is <a href="files/some/random/hgidasghrsgh"> more than one level</a> (404).</li>
+        <li>Use <a href="doublewild/some/random/hgidasghrsgh">doublewild/**</a> for that (<code>context.parameters.getCatchAll().joined(separator: "/")</code>).</li></li>
+      </ul>
+    <li>typed parameters can be captured, like <a href="/user/8675309"> this Int</a></li>
+    <li>and the urls can have more than <a href="/user/8675309/Jenny">one level</a></li>
+    <li>there's even some basic pattern matching to do things like <a href=/img/bunny.jpg>file names.</a> </li>
+    <li>or one can form the url <a href="query?id=3.14&message=hey%20cutie%20pie">like a query</a></li>
+    <li>some times urls for a natural group</li>
+      <ul>
+        <li>like maybe a <a href="circus">circus</a></li>
+        <ul>
+          <li>where one can get <a href=circus/peanuts>peanuts</a></li>
+          <li>with a ring for <a href="/circus/clowns">clowns</a></li>
+          <ul><li>that can be called <a href="/circus/clowns/pagliacci">by name</a></li></ul>
+        </ul>
+      </ul>
+   </ul>
+
+   <p> 
+        One can also submit information with POST!<br>
+        JSON decoding is the default: <br>
+        <code>curl -i -X POST localhost:8080/decodable/default -d'{"number":12,"phrase":"are you going to go my way"}'</code>
+    </p>
+   <p>Or one can use the provided <code>URLEncodedFormDecoder</code> a form (<code>/x-www-form-urlencoded</code>): </p>
+   <form action="/decodable/form" method="POST">
+        <label for="number">Number: (please submit an Int)</label>
+        <input type="text" id="number" name="number"><br><br>
+        <label for="phrase">Phrase:</label>
+        <input type="text" id="phrase" name="phrase"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+
+   <p><a href="test.html">go to different page in this folder.</a><p>
+</body>
+</html>
