@@ -125,4 +125,24 @@ struct AppTests {
             }
         }
     }
+
+    @Test func testPercentEncoding() async throws  {
+        let app = try await buildApplication(TestArguments(), clownStore: clownStore)
+
+        try await app.test(.router) { client in
+            let acrobat = "this is fine"
+            let encodedAcrobat = acrobat.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "no_one_here"
+            let _ = try await client.execute(uri: "/acrobat/\(encodedAcrobat)", method: .get) { response in
+                #expect(response.status == .ok)
+                
+                #expect(response.headers.contains(.contentType))
+                let contentType = response.headers[.contentType]!
+                #expect(contentType == "text/html")
+
+                let body = String(buffer:response.body)
+                #expect(body.contains(acrobat))
+                #expect(body.contains("<p>__________\(acrobat)__________________________</p>"))
+            }
+        }
+    }
 }

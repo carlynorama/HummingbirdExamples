@@ -70,7 +70,8 @@ func buildRouter(clownStore:ClownController) async throws -> Router<AppRequestCo
         guard let message = context.parameters.get("message", as: String.self) else {
             throw HTTPError(.badRequest)
         }
-        return MustacheHTML(message, library: mustacheLibrary)
+        let decoded = message.removingPercentEncoding ?? "can't-balance-here"
+        return MustacheHTML(decoded, library: mustacheLibrary)
     }
 
     // Child COntext
