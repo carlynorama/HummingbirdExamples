@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Webpage: Site Index Page</title>
+    <meta charset="UTF-8">
+
+</head>
+<body>
+<H2>Fetched</H2>
+  <pre id="all-clowns"></pre>
+  <div>
+    <p id="name"></p>
+    <p id="id"></p>
+    <p id="spareNoses"></p>
+  </div>
+  <script src="js/index.js"></script>
+<H2>Links</H2>
+   <ul>
+    <li>Welcome to the Circus</li>
+      <ul>
+        <li>where one can get <a href=/peanuts>peanuts</a></li>
+        <li>with a ring for <a href="/clowns">clowns</a></li>
+        <ul><li>that can be called <a href="/clowns/4">by name</a></li></ul>
+      </ul>
+   </ul>
+   <p> 
+        One can also submit information with POST!<br>
+        JSON decoding is the default: <br>
+        <code>curl -i -X POST localhost:8080/circus/default -d'{"number":12,"phrase":"are you going to go my way"}'</code>
+    </p>
+   <p>Or one can use the provided <code>URLEncodedFormDecoder</code> for a form (<code>/x-www-form-urlencoded</code>): </p>
+   <form action="/circus/form" method="POST">
+        <label for="number">Number: (please submit an Int)</label>
+        <input type="text" id="number" name="number"><br><br>
+        <label for="phrase">Phrase:</label>
+        <input type="text" id="phrase" name="phrase"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+
+   <p><a href="test.html">go to different page in this folder.</a><p>
+</body>
+</html>
