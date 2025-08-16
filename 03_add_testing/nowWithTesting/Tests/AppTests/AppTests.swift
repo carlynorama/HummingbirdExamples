@@ -120,7 +120,7 @@ struct AppTests {
                 #expect(response.status == .ok)
                 print("responseBody default: \(String(buffer: response.body))")
 
-                //TODO: json shows up in arbitrary order.
+                //TODO: json shows up in arbitrary order. check against a dictionary?
                 //let testString:String = "{\"phrase\":\"\(codedData.phrase!)\",\"number\":\(codedData.number)}"
 
                 #expect(String(buffer: response.body).contains("\"number\":\(codedData.number)"))
@@ -128,8 +128,12 @@ struct AppTests {
             }
 
             
-            buffer = ByteBuffer(string: "number=\(codedData.number)&phrase=\"\(codedData.phrase)\"")
-            let _ = try await client.execute(uri: "/decodable/form", method: .post, body:buffer) { response in
+            buffer = ByteBuffer(string: "number=\(codedData.number)&phrase=\(codedData.phrase!)")
+            let _ = try await client.execute(uri: "/decodable/form", 
+                                            method: .post, 
+                                            //need header if detecting based on header, which not yet.
+                                            //headers: [.contentType: "application/x-www-form-urlencoded"], 
+                                            body:buffer) { response in
                 #expect(response.status == .ok)
                 print("responseBody form: \(String(buffer: response.body))")
                 #expect(String(buffer: response.body).contains("\"number\":\(codedData.number)"))

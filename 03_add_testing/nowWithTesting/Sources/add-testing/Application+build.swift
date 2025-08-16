@@ -168,7 +168,7 @@ func buildRouter() -> Router<AppRequestContext> {
         //curl -i -X POST localhost:8080/decodable/default -d'{"number":12,"phrase":"are you going to go my way"}'
         .post("default") { request, context in
             let decoded = try await request.decode(as: MiniCodable.self, context: context)
-            print("DECODED DEFAULT: \(decoded.number) \(decoded.phrase)")
+            print("DECODED DEFAULT: \(decoded.number) \(decoded.phrase ?? "")")
             return decoded //also consider an HTTPResponseStatus
         }
         .post("form") { request, context in
