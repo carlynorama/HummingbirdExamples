@@ -15,8 +15,8 @@ Both `GET` and `POST` shown.
 
 Start writing some tests before anything gets to complicated
 
-## 04_front_end_wok
+## 04_front_end_work
 
-While in testing it would be good to be able to begin prototyping the front end on our little local server.  Some examples. 
+While in testing it would be good to be able to begin prototyping the front end a little on our little local server.  Some examples. 
 
 
