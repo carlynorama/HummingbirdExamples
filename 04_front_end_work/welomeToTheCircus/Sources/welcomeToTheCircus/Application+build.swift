@@ -1,6 +1,8 @@
 import Hummingbird
 import Logging
 
+import Foundation
+import Mustache
 
 //There is one main Context type per router. In case this needs to change in the
 //future its handy to set the type as an alias so won't need to update all the 
@@ -19,7 +21,7 @@ public func buildApplication(_ arguments: some AppArguments, clownStore:ClownCon
         return logger
     }()
 
-    let router = buildRouter(clownStore: clownStore)
+    let router = try await buildRouter(clownStore: clownStore)
 
     let app = Application(
         router: router,
@@ -34,8 +36,11 @@ public func buildApplication(_ arguments: some AppArguments, clownStore:ClownCon
 
 }
 
-func buildRouter(clownStore:ClownController) -> Router<AppRequestContext> {
+func buildRouter(clownStore:ClownController) async throws -> Router<AppRequestContext> {
     let router = Router(context: AppRequestContext.self)
+     let mustacheLibrary = try await MustacheLibrary(directory: Bundle.module.resourcePath!)
+
+
 
     router.addMiddleware {
         // logging middleware
@@ -58,6 +63,14 @@ func buildRouter(clownStore:ClownController) -> Router<AppRequestContext> {
             throw HTTPError(.badRequest)
         }
         return AnnouncementHTML(message)
+    }
+
+    router.get("testHandlebars/") { _, _ in "not here"}
+    router.get("testHandlebars/:message") { _, context in
+        guard let message = context.parameters.get("message", as: String.self) else {
+            throw HTTPError(.badRequest)
+        }
+        return MustacheHTML(message, library: mustacheLibrary)
     }
 
     // Child COntext
