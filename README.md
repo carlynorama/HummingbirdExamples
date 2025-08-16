@@ -13,6 +13,10 @@ Both `GET` and `POST` shown.
 
 ## 03_add_testing
 
-Start writing some tests!
+Start writing some tests before anything gets to complicated
+
+## 04_front_end_wok
+
+While in testing it would be good to be able to begin prototyping the front end on our little local server.  Some examples. 
 
 
