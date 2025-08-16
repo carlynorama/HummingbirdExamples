@@ -1,5 +1,10 @@
-import Hummingbird
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
+
+import Hummingbird
 
 
 public struct ClownController:Sendable {

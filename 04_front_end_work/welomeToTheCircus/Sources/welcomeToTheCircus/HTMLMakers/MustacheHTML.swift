@@ -1,8 +1,13 @@
-import Mustache
 import Hummingbird
 
-
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
+import Mustache
+
+
 
 struct BasicInfo {
     let title: String

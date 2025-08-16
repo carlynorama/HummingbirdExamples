@@ -1,7 +1,11 @@
 import Hummingbird
 import Logging
 
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
 import Mustache
 
 //There is one main Context type per router. In case this needs to change in the
