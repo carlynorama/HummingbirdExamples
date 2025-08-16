@@ -2,7 +2,7 @@ import Hummingbird
 
 /// Type wrapping HTML code. Will convert to HBResponse that includes the correct
 /// content-type header
-struct AnnouncementHTML: ResponseGenerator {
+struct OrganPlayerHTML: ResponseGenerator {
     let message: String
 
     init(_ message: String) {
@@ -23,7 +23,7 @@ struct AnnouncementHTML: ResponseGenerator {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Announcement!!</title>
+            <title>Hear the Music!!!</title>
             <meta charset="UTF-8">
 
         </head>

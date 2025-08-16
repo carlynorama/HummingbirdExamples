@@ -58,15 +58,15 @@ func buildRouter(clownStore:ClownController) async throws -> Router<AppRequestCo
     router.get("peanuts") { _, _ in "yummy peanuts"}
     router.addRoutes(clownStore.endpoints, atPath: "clowns")
     
-    router.get("announcement/:message") { _, context in
+    router.get("organ/:message") { _, context in
         guard let message = context.parameters.get("message", as: String.self) else {
             throw HTTPError(.badRequest)
         }
-        return AnnouncementHTML(message)
+        return OrganPlayerHTML(message)
     }
 
-    router.get("testHandlebars/") { _, _ in "not here"}
-    router.get("testHandlebars/:message") { _, context in
+    router.get("/acrobat") { _, _ in "not here"}
+    router.get("acrobat/:message") { _, context in
         guard let message = context.parameters.get("message", as: String.self) else {
             throw HTTPError(.badRequest)
         }

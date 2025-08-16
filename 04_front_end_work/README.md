@@ -9,6 +9,7 @@ Done
 
 To Do
 - update tests
+- percent encode URL strings
 
 If Time
 - css
