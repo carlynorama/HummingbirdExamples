@@ -6,37 +6,33 @@
 
 </head>
 <body>
-<H2>Fetched</H2>
+<H2>Links</H2>
+<p>Welcome to the Circus</p>
+   <ul>
+    <li>These links return raw data (some flavor of <code>String</code>) in their response bodies</li>
+      <ul>
+        <li>where one can get <a href=/peanuts>peanuts</a></li>
+        <li>with a ring for <a href="/clowns">clowns</a></li>
+        <ul><li>that can be called <a href="/clowns/4">by id</a></li></ul>
+      </ul>
+    <li>These links return generated HTML pages as their response bodies</li>
+      <ul>
+        <li><a href=/announcement/LaTaDadaDadaLaTaDaDah>see a message</a></li>
+        <!-- <li>Go to an <a href="/acrobats">index page for acrobats</a></li>
+        <ul><li>Subpage for <a href="/acrobats/tightrope">tightrope</a></li></ul> -->
+      </ul>
+   </ul>
+   <p> 
+<H2>Fetched JSON Data</H2>
+  <script src="js/index.js"></script>
   <pre id="all-clowns"></pre>
   <div>
     <p id="name"></p>
     <p id="id"></p>
     <p id="spareNoses"></p>
   </div>
-  <script src="js/index.js"></script>
-<H2>Links</H2>
-   <ul>
-    <li>Welcome to the Circus</li>
-      <ul>
-        <li>where one can get <a href=/peanuts>peanuts</a></li>
-        <li>with a ring for <a href="/clowns">clowns</a></li>
-        <ul><li>that can be called <a href="/clowns/4">by name</a></li></ul>
-      </ul>
-   </ul>
-   <p> 
-        One can also submit information with POST!<br>
-        JSON decoding is the default: <br>
-        <code>curl -i -X POST localhost:8080/circus/default -d'{"number":12,"phrase":"are you going to go my way"}'</code>
-    </p>
-   <p>Or one can use the provided <code>URLEncodedFormDecoder</code> for a form (<code>/x-www-form-urlencoded</code>): </p>
-   <form action="/circus/form" method="POST">
-        <label for="number">Number: (please submit an Int)</label>
-        <input type="text" id="number" name="number"><br><br>
-        <label for="phrase">Phrase:</label>
-        <input type="text" id="phrase" name="phrase"><br><br>
-        <input type="submit" value="Submit">
-    </form>
 
-   <p><a href="test.html">go to different page in this folder.</a><p>
+
+
 </body>
 </html>

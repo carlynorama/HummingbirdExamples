@@ -53,6 +53,12 @@ func buildRouter(clownStore:ClownController) -> Router<AppRequestContext> {
     router.get("peanuts") { _, _ in "yummy peanuts"}
     router.addRoutes(clownStore.endpoints, atPath: "clowns")
     
+    router.get("announcement/:message") { _, context in
+        guard let message = context.parameters.get("message", as: String.self) else {
+            throw HTTPError(.badRequest)
+        }
+        return AnnouncementHTML(message)
+    }
 
     // Child COntext
 
