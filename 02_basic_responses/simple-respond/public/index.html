@@ -37,7 +37,7 @@
         JSON decoding is the default: <br>
         <code>curl -i -X POST localhost:8080/decodable/default -d'{"number":12,"phrase":"are you going to go my way"}'</code>
     </p>
-   <p>Or one can use the provided <code>URLEncodedFormDecoder</code> a form (<code>/x-www-form-urlencoded</code>): </p>
+   <p>Or one can use the provided <code>URLEncodedFormDecoder</code> for a form (<code>/x-www-form-urlencoded</code>): </p>
    <form action="/decodable/form" method="POST">
         <label for="number">Number: (please submit an Int)</label>
         <input type="text" id="number" name="number"><br><br>

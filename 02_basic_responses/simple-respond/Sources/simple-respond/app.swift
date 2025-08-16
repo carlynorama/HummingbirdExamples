@@ -13,9 +13,6 @@ struct AppCommand: AsyncParsableCommand, AppArguments {
     @Option(name: .shortAndLong)
     var logLevel: Logger.Level?
 
-    @Flag
-    var inMemoryTesting: Bool = false
-
     var nameTag: String = "simple-responder"
 
     func run() async throws {
