@@ -1,0 +1,2 @@
+https://github.com/apple/swift-openapi-generator/tree/main/Examples/hello-world-urlsession-client-example
+https://swiftpackageindex.com/apple/swift-openapi-generator/1.10.2/tutorials/swift-openapi-generator/clientswiftpm
