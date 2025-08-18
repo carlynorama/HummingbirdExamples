@@ -29,9 +29,17 @@ struct Handler: APIProtocol {
     }
 }
 
+
+
 @main struct HelloWorldHummingbirdServer {
     static func main() async throws {
+
         let router = Router()
+        router.middlewares.add(FileMiddleware(searchForIndexHtml: true))
+
+        /// //The below won't take .redirect without Response
+        router.get("openapi") { _, _ in Response.redirect(to: "openapi.html", type: .normal) } 
+
         let handler = Handler()
         try handler.registerHandlers(on: router, serverURL: URL(string: "/api")!)
         let app = Application(router: router, configuration: .init())
