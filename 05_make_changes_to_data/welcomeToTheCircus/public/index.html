@@ -1,28 +1,39 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Test Webpage: Site Index Page</title>
-    <meta charset="UTF-8">
+  <title>Test Webpage: Site Index Page</title>
+  <meta charset="UTF-8">
 
 </head>
+
 <body>
-<H2>Links</H2>
-<p>Welcome to the Circus</p>
-   <ul>
+  <H2>Links</H2>
+  <p>Welcome to the Circus</p>
+  <ul>
     <li>These links return raw data (some flavor of <code>String</code>) in their response bodies</li>
+    <ul>
+      <li>where one can get <a href=/peanuts>peanuts</a></li>
+      <li>with a ring for <a href="/clowns">clowns</a></li>
       <ul>
-        <li>where one can get <a href=/peanuts>peanuts</a></li>
-        <li>with a ring for <a href="/clowns">clowns</a></li>
-        <ul><li>that can be called <a href="/clowns/4">by id</a></li></ul>
+        <li>that can be called <a href="/clowns/4">by id</a></li>
       </ul>
+    </ul>
     <li>These links return generated HTML pages as their response bodies</li>
-      <ul>
-        <li><a href=/organ/LaTaDadaDadaLaTaDaDah>organ music</a></li>
-        <li><a href=/acrobat/not%20gonna%20fall>acrobat</a></li>
-      </ul>
-   </ul>
-   <p> 
-<H2>Fetched JSON Data</H2>
+    <ul>
+      <li><a href=/organ/LaTaDadaDadaLaTaDaDah>organ music</a></li>
+      <li><a href=/acrobat/not%20gonna%20fall>acrobat</a></li>
+    </ul>
+    <li>Check out the <a href="/midway/">midway</a></li>
+    <li>Careers</li>
+    <ul>
+      <li><a href="join.html">Join the circus!</a></li>
+      <li><a href="leave.html">Leave the circus!</a></li>
+    </ul>
+
+  </ul>
+  <p>
+  <H2>Fetched JSON Data</H2>
   <script src="js/index.js"></script>
   <pre id="all-clowns"></pre>
   <div>
@@ -34,4 +45,5 @@
 
 
 </body>
+
 </html>

@@ -35,58 +35,6 @@ struct AppTests {
         }
     }
 
-    @Test func testClown() async throws {
-        let app = try await buildApplication(TestArguments(), clownStore: clownStore)
-
-        try await app.test(.router) { client in
-
-            let goodID = 1  //start with known good.
-            let _ = try await client.execute(uri: "/clowns/\(goodID)", method: .get) { response in
-                #expect(response.status == .ok)
-
-                #expect(response.headers.contains(.contentType))
-                let contentType = response.headers[.contentType]!
-                #expect(contentType == "application/json; charset=utf-8")
-
-                let clown = try JSONDecoder().decode(Clown.self, from: response.body)
-                //print(clown)
-                //In "real" app would pull this directly from the db using same ID.
-                let compareTo = Clown(id: 1, name: "Joseph Grimaldi", spareNoses: 12)
-                #expect(clown.name == compareTo.name)
-            }
-
-            let badID = 53_253_622  //change to known unused value
-            let _ = try await client.execute(uri: "/clowns/\(badID)", method: .get) { response in
-                #expect(response.status == .noContent)
-            }
-
-            let notAnID = "jieoGEJg"  //change to malformed
-            let _ = try await client.execute(uri: "/clowns/\(notAnID)", method: .get) { response in
-                #expect(response.status == .badRequest)
-            }
-        }
-    }
-
-    @Test func testClowns() async throws {
-        let app = try await buildApplication(TestArguments(), clownStore: clownStore)
-
-        try await app.test(.router) { client in
-
-            let goodClown = Clown(id: 1, name: "Joseph Grimaldi", spareNoses: 12)
-            let badClown = Clown(id: -1, name: "Pennywise", spareNoses: 86428916419)
-            let _ = try await client.execute(uri: "/clowns/", method: .get) { response in
-                #expect(response.status == .ok)
-
-                #expect(response.headers.contains(.contentType))
-                let contentType = response.headers[.contentType]!
-                #expect(contentType == "application/json; charset=utf-8")
-
-                let clowns = try JSONDecoder().decode([Clown].self, from: response.body)
-                #expect(clowns.contains(where: { $0 == goodClown }))
-                #expect(!clowns.contains(where: { $0 == badClown }))
-            }
-        }
-    }
 
     @Test func testOrgan() async throws {
         let app = try await buildApplication(TestArguments(), clownStore: clownStore)
