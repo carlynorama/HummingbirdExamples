@@ -1,6 +1,7 @@
 import Hummingbird
 
-//TODO: encoding fails on actor, as does RawRepresentable
+//TODO: Re-write all of this as Result
+
 actor ClownCar {
     var clowns:[Int:Clown]
 
@@ -43,13 +44,18 @@ actor ClownCar {
         }
         return nil
     }
+
     /// Delete clown. Returns true if successful
-    func delete(id: Int) async throws -> Bool {
+    func delete(id: Int) async throws -> Int? {
+        var response:Int?
         if self.clowns[id] != nil {
+            response = 0
             self.clowns[id] = nil
-            return true
+            response = 1
+        } else {
+            response = nil
         }
-        return false
+        return response
     }
     /// Delete all clowns
     func deleteAll() async throws {

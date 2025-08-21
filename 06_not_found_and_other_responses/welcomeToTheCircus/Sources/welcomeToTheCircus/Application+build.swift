@@ -49,6 +49,8 @@ func buildRouter(clownStore:ClownController) async throws -> Router<AppRequestCo
     router.addMiddleware {
         // logging middleware
         LogRequestsMiddleware(.info)
+        //404 Pages Service
+        NotFoundMiddleware(notFoundResponse: .basicPage)
         //serves the static files in public folder by default. 
         FileMiddleware(searchForIndexHtml: true)
     }

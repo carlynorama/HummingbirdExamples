@@ -7,3 +7,9 @@
         - INCLUDING A SYMLINK
             - moved openapi.yaml to public folder
             - from original location: `ln -s ../../public/openapi.yaml openapi.yaml`
+
+
+
+- example APIs
+    - https://developer.digikey.com/products/quote/quote-v4/addproductstoquote
+    - fastapi generated example

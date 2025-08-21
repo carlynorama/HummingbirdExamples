@@ -5,6 +5,9 @@ import Foundation
 #endif
 import Hummingbird
 
+    //TODO: Are these the correct responses? 
+    //https://en.wikipedia.org/wiki/OpenAPI_Specification
+
 public struct ClownController: Sendable {
     // clown repository
     let repository: ClownCar
@@ -26,16 +29,18 @@ public struct ClownController: Sendable {
             .group("form")
                 .post("join", use: formCreate)
                 //TODO should this be delete? the form data is being patched.
-                .post("leave", use: formDelete)
+                .post("leave", use: formDeleteWithNameVerify)
                 .post("honk", use: formNoseDecrement)
 
         return routes
     }
 
     /// Get clown endpoint
-    @Sendable func get(request: Request, context: some RequestContext) async throws -> Clown? {
+    @Sendable func get(request: Request, context: some RequestContext) async throws -> OptionalHandler<Clown> {
         let id = try context.parameters.require("id", as: Int.self)
-        return try await self.repository.get(id: id)
+        let clown = try await self.repository.get(id: id)
+        return OptionalHandler(value:clown)
+        //return try await self.repository.get(id: id)
     }
 
     /// Get list of clowns endpoint
@@ -73,7 +78,7 @@ public struct ClownController: Sendable {
         let spareNoses: Int?
     }
     /// Update clown endpoint
-    @Sendable func update(request: Request, context: some RequestContext) async throws -> Clown? {
+    @Sendable func update(request: Request, context: some RequestContext) async throws -> Clown {
         let id = try context.parameters.require("id", as: Int.self)
         let requestValue = try await request.decode(as: UpdateRequest.self, context: context)
         guard
@@ -83,7 +88,7 @@ public struct ClownController: Sendable {
                 spareNoses: requestValue.spareNoses
             )
         else {
-            throw HTTPError(.badRequest)
+            throw HTTPError(.notFound)
         }
         return clown
     }
@@ -93,14 +98,17 @@ public struct ClownController: Sendable {
     }
 
     @Sendable func formNoseDecrement(request: Request, context: some RequestContext) async throws
-        -> Clown?
-    {
+        -> OptionalHandler<Clown>
+    {   
         let request = try await URLEncodedFormDecoder().decode(HonkRequest.self, from: request, context: context)
                 //let id = try context.parameters.require("id", as: Int.self)
         if let beforeClown = try await self.repository.get(id:request.id) {
-            return try await self.repository.update(id: request.id, name: nil, spareNoses: beforeClown.spareNoses - 1)
+            return OptionalHandler<Clown>(value:try await self.repository.update(id: request.id, name: nil, spareNoses: beforeClown.spareNoses - 1))
+        } else {
+            
+            return  OptionalHandler<Clown>(value: nil)
         }
-        return nil 
+
     }
 
     /// Delete clown endpoint
@@ -108,10 +116,12 @@ public struct ClownController: Sendable {
         -> HTTPResponse.Status
     {
         let id = try context.parameters.require("id", as: Int.self)
-        if try await self.repository.delete(id: id) {
-            return .ok
-        } else {
-            return .badRequest
+        let deleteResult = try await self.repository.delete(id: id)
+        switch deleteResult {
+            case 1: return .noContent //success, no clown in response body. 
+            case 0: return .badRequest
+            case nil: return .notFound // or should this be .notFound? put it in the body.
+            default: throw ClownError.undefinedResult
         }
     }
 
@@ -120,22 +130,27 @@ public struct ClownController: Sendable {
         let name: String
     }
 
-    @Sendable func formDelete(request: Request, context: some RequestContext) async throws
+
+    @Sendable func formDeleteWithNameVerify(request: Request, context: some RequestContext) async throws
         -> HTTPResponse.Status
     {
         let request = try await URLEncodedFormDecoder().decode(DeleteRequest.self, from: request, context: context)
                 //let id = try context.parameters.require("id", as: Int.self)
         if let record = try await self.repository.get(id:request.id) {
-            if record.name == request.name {
-            if try await self.repository.delete(id: request.id) {
-                return .ok
-            } else {
-                return .badRequest
+                
+                if record.name == request.name {
+                    let deleteResult:Int? = try await self.repository.delete(id: request.id)
+                    switch deleteResult {
+                        case 1: return .noContent //success, no clown in response body. 
+                        case 0: return .badRequest
+                        case nil: return .notFound
+                        default: throw ClownError.undefinedResult
+                    }
+                } else {
+                        return .badRequest
+                }
             }
-            }
-            return .badRequest
-        }
-        return .noContent
+        return .notFound
     }
 
 

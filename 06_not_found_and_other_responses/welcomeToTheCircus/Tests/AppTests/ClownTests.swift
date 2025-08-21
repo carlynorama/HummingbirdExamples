@@ -104,7 +104,6 @@ extension AppTests {
         let request = DeleteRequest(id:id, name: name)
         let buffer = ByteBuffer(string:try URLEncodedFormEncoder().encode(request))
         return try await client.execute(uri: "/clowns/form/leave", method: .post, body: buffer) { response in
-            #expect(response.status == .ok)
             return response.status
         }
     }
@@ -142,12 +141,14 @@ extension AppTests {
 
             let badID = 53_253_622  //change to known unused value
             let _ = try await client.execute(uri: "/clowns/\(badID)", method: .get) { response in
-                #expect(response.status == .noContent)
+                #expect(response.status == .notFound)
             }
 
-            let notAnID = "jieoGEJg"  //change to malformed
+            //TODO: research opinions on badRequest and Type Validation.
+            let notAnID = "jie8oGEJg"  //change to malformed 
             let _ = try await client.execute(uri: "/clowns/\(notAnID)", method: .get) { response in
                 #expect(response.status == .badRequest)
+                //#expect(response.status == .unprocessableContent)
             }
         }
     }
@@ -157,7 +158,8 @@ extension AppTests {
 
         try await app.test(.router) { client in
 
-            let goodClown = Clown(id: 1, name: "Joseph Grimaldi", spareNoses: 12)
+            //TODO: change this to fetching a random clown from the repos.
+            let goodClown = Clown(id: 1, name: "Joseph Grimaldi", spareNoses: 41417)
             let badClown = Clown(id: -1, name: "Pennywise", spareNoses: 86428916419)
             let _ = try await client.execute(uri: "/clowns/", method: .get) { response in
                 #expect(response.status == .ok)
@@ -167,6 +169,7 @@ extension AppTests {
                 #expect(contentType == "application/json; charset=utf-8")
 
                 let clowns = try JSONDecoder().decode([Clown].self, from: response.body)
+                print(clowns)
                 #expect(clowns.contains(where: { $0 == goodClown }))
                 #expect(!clowns.contains(where: { $0 == badClown }))
             }
@@ -235,29 +238,37 @@ extension AppTests {
             let newName = "Bozo Jr."
             let newNoseCount = 18
             let _ = try await client.execute(uri: "/clowns/\(knownBadID)", method: .get) { response in
-                #expect(response.status == .noContent)
+                #expect(response.status == .notFound)
             }
             var updateStatus = try await Self.patchResponseStatus(id:"\(knownBadID)", name: newName, spareNoses: newNoseCount, client: client)
-            #expect(updateStatus == .badRequest)
+            #expect(updateStatus == .notFound)
 
             updateStatus = try await Self.patchResponseStatus(id:"fgu8ik56gw3R)", name: newName, spareNoses: newNoseCount, client: client)
             #expect(updateStatus == .badRequest)
+            //#expect(updateStatus == .unprocessableContent)
             
 
 
         }
     }
 
-    @Test func testUpdateNoses() async throws {
+    @Test func testFormDecrementNose() async throws {
         let app = try await buildApplication(TestArguments(), clownStore: clownStore)
 
         try await app.test(.router) { client in
             let knownGoodID = 4
-            let newNoseCount = 18
+            //let newNoseCount = 18
             let beforeClown = try await Self.get(id: knownGoodID, client: client)
-            //client.execute(uri: "/clowns/honk", method: .post)
+            #expect(beforeClown != nil)
+            let response = try await client.execute(uri: "/clowns/form/honk/", 
+                                     method: .post,
+                                     body: ByteBuffer(string: "id=\(knownGoodID)"))
+
+            #expect(response.status == .ok)
+            //try await request.decode(as: UpdateRequest.self, context: context)
+            //print(String(buffer:response.body))
             // let clown = try await Self.patch(id: knownGoodID, spareNoses: newNoseCount, client: client)
-            // #expect(clown != nil)
+            // #expect(responseClown != nil)
             // #expect(clown!.spareNoses == newNoseCount )
             // #expect(clown!.name == beforeClown?.name )
             // #expect(clown!.spareNoses != beforeClown?.spareNoses)
@@ -270,7 +281,7 @@ extension AppTests {
         }
     }
 
-    @Test func testFormDecrementNose() async throws {
+    @Test func testUpdateNose() async throws {
         let app = try await buildApplication(TestArguments(), clownStore: clownStore)
 
         try await app.test(.router) { client in
@@ -312,6 +323,18 @@ extension AppTests {
         }
     }
 
+
+//        If a DELETE method is successfully applied, the origin server SHOULD
+//    send a 202 (Accepted) status code if the action will likely succeed
+//    but has not yet been enacted, a 204 (No Content) status code if the
+//    action has been enacted and no further information is to be supplied,
+//    or a 200 (OK) status code if the action has been enacted and the
+//    response message includes a representation describing the status.
+
+//    A payload within a DELETE request message has no defined semantics;
+//    sending a payload body on a DELETE request might cause some existing
+//    implementations to reject the request.
+
     //MARK: Test Deletes
     @Test func testDelete() async throws {
         let app = try await buildApplication(TestArguments(), clownStore: clownStore)
@@ -321,12 +344,12 @@ extension AppTests {
             let beforeClown = try await Self.get(id: knownGoodID, client: client)
             #expect(beforeClown != nil)
             let status = try await Self.delete(id: knownGoodID, client: client)
-            #expect(status == .ok)
+            #expect(status == .ok || status == .noContent)
             try await client.execute(uri: "/clowns/\(knownGoodID)", method: .get) { response in
-                #expect(response.status == .noContent)
+                #expect(response.status == .notFound)
             }
             try await client.execute(uri: "/clowns/\(knownGoodID)", method: .delete) { response in
-                #expect(response.status == .badRequest)
+                #expect(response.status == .notFound)
             }
         }
 
@@ -338,16 +361,22 @@ extension AppTests {
         try await app.test(.router) { client in
             let knownGoodID = 4
             let beforeClown = try await Self.get(id: knownGoodID, client: client)
-            #expect(beforeClown != nil)
-            let status = try await Self.formDelete(id: knownGoodID, name: beforeClown!.name, client: client)
-            #expect(status == .ok)
+            #expect(beforeClown != nil, "for this test, clown should exist before deleting")
+
+            var status = try await Self.formDelete(id: knownGoodID, name: "hfu5lgh82", client: client)
+            #expect(status == .badRequest, "bad name should be badRequest not \(status)") 
+
+            status = try await Self.formDelete(id: knownGoodID, name: beforeClown!.name, client: client)
+            #expect(status == .noContent, "successful delete with no payload should be noContent not \(status)")
+            
+            status = try await Self.delete(id: knownGoodID, client: client)
+            #expect(status == .notFound, "clown should be badRequest on second delete, not \(status)")
+            
             try await client.execute(uri: "/clowns/\(knownGoodID)", method: .get) { response in
-                #expect(response.status == .noContent)
-            }
-            try await client.execute(uri: "/clowns/\(knownGoodID)", method: .delete) { response in
-                #expect(response.status == .badRequest)
+                #expect(response.status == .notFound, "clown should be notFound after being deleted, not \(response.status)")
             }
         }
+        
 
     }
     
@@ -362,10 +391,10 @@ extension AppTests {
             let status = try await Self.deleteAll(client: client)
             #expect(status == .ok)
             try await client.execute(uri: "/clowns/\(knownGoodID)", method: .get) { response in
-                #expect(response.status == .noContent)
+                #expect(response.status == .notFound)
             }
             try await client.execute(uri: "/clowns/\(knownGoodID)", method: .delete) { response in
-                #expect(response.status == .badRequest)
+                #expect(response.status == .notFound)
             }
 
             let deletedClowns = try await Self.list(client: client)
