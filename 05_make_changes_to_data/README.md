@@ -15,6 +15,8 @@
     [-] boop nose of a clown
         - needs redirect
 
+Do redirect in next batch. 
+
 Extras
 - notify nose vendor when out of noses? 
 - allow vendor to resupply clown?
