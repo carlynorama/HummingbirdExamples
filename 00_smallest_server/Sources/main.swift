@@ -1,9 +1,3 @@
-// import Hummingbird
-// // create router and add a single GET /hello route
-// let router = Router()
-//     .get("hello") { request, _ -> String in
-//         return "Hello"
-//     }
 
 
 import Hummingbird
