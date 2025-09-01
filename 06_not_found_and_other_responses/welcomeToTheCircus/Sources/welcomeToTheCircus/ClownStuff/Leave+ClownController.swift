@@ -1,5 +1,0 @@
-import Hummingbird
-
-extension ClownController {
-    
-}
