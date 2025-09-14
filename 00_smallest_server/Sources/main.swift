@@ -3,8 +3,7 @@
 import Hummingbird
 // create router and add a single GET /hello route
 
-//ADDING A CONFIGURATION REQUIRED TO MAKE _CONTAINER_ WORK
-//TODO: Why?
+//ADDING A CONFIGURATION IS REQUIRED TO MAKE _CONTAINER_ WORK
 let hostname: String = "0.0.0.0"
 let port: Int = 8080
 let configuration: ApplicationConfiguration = .init(
@@ -12,10 +11,10 @@ let configuration: ApplicationConfiguration = .init(
     serverName: "SmallestServer"
 )
 
-let router = Router()
-    .get("hello") { request, _ -> String in
-        return "Hello"
-    }
+let router = Router().get { req, context in
+    return "Hello, Swift!"
+}
+
 // create application using router
 let app = Application(router: router, configuration:configuration)
 // run hummingbird application
