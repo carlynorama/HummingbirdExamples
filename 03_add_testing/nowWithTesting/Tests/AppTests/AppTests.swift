@@ -111,10 +111,10 @@ struct AppTests {
     @Test func testDecoding() async throws {
         let app = try await buildApplication(TestArguments())
         try await app.test(.router) { client in
+        
             let _ = try await client.execute(uri: "/decodable/default", method: .post) { response in
-                #expect(response.status == .badRequest)
+                #expect(response.status == .badRequest, "not the status expected from an empty post")
             }
-
 
             let codedData = MiniCodable(number: 34, phrase:"something to say")
 
@@ -125,11 +125,12 @@ struct AppTests {
                 #expect(response.status == .ok)
                 print("responseBody default: \(String(buffer: response.body))")
 
-                //TODO: json shows up in arbitrary order. check against a dictionary?
-                //let testString:String = "{\"phrase\":\"\(codedData.phrase!)\",\"number\":\(codedData.number)}"
+                //json shows up in arbitrary order, so check for values individually.
 
-                #expect(String(buffer: response.body).contains("\"number\":\(codedData.number)"))
-                #expect(String(buffer: response.body).contains("\"phrase\":\"\(codedData.phrase!)\""))
+				//responseBody looks like
+				//"DECODED: MiniCodable(number: 34, phrase: Optional("something to say"))").contains("\"number\":\(codedData.number)"
+                #expect(String(buffer: response.body).contains("number: \(codedData.number)"))
+                #expect(String(buffer: response.body).contains("phrase: \"Optional(\(codedData.phrase!))\""))
             }
 
             
