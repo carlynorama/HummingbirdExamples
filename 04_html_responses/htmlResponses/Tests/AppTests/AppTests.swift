@@ -31,131 +31,33 @@ struct AppTests {
             }
         }
     }
-
-    @Test func testGoodbye() async throws{
-        let app = try await buildApplication(TestArguments())
+    
+    
+    //These are pretty minimal tests. Just that the routes exist.
+    //Unhappy paths, valid HTML headers, valid HTML, that the content is as expected are
+    //all things one might test in a more comprehensive suite. 
+    
+    @Test func testOrgan() async throws {
+    	let app = try await buildApplication(TestArguments())
         try await app.test(.router) { client in
-            let _ = try await client.execute(uri: "/goodbye", method: .get) { response in
+        	let message = "myMessage"
+            let _ = try await client.execute(uri: "/organ/\(message)", method: .get) { response in
                 #expect(response.status == .ok)
-                #expect(String(buffer: response.body) == "Ciao!")
-
             }
         }
+    
     }
-
-    @Test func testEncodable() async throws {
+    
+    @Test func testAcrobat() async throws {
         let app = try await buildApplication(TestArguments())
         try await app.test(.router) { client in
-            let _ = try await client.execute(uri: "/encodable", method: .get) { response in
+        	//http://localhost:8080/acrobat/not%20gonna%20fall
+        	let message = "myMessage"
+            let _ = try await client.execute(uri: "/acrobat/\(message)", method: .get) { response in
                 #expect(response.status == .ok)
-                //print(String(buffer: response.body))
-                #expect(String(buffer: response.body) == "{\"number\":5,\"phrase\":\"hello!\"}")
-
             }
         }
+    
+    
     }
-
-    @Test func testSingleWild() async throws {
-        let app = try await buildApplication(TestArguments())
-        try await app.test(.router) { client in
-
-            let _ = try await client.execute(uri: "/files/", method: .get) { response in
-                #expect(response.status == .notFound)
-            }
-
-            let _ = try await client.execute(uri: "/files/testPhrase", method: .get) { response in
-                #expect(response.status == .ok)
-                #expect(String(buffer: response.body) == "/files/testPhrase")
-            }
-
-            let _ = try await client.execute(uri: "/files/too/many/things", method: .get) { response in
-                #expect(response.status == .notFound)
-            }
-        }
-    }
-
-    @Test func testUser() async throws {
-        let app = try await buildApplication(TestArguments())
-        try await app.test(.router) { client in
-
-            let _ = try await client.execute(uri: "/user/garbfjfesage", method: .get) { response in
-                #expect(response.status == .badRequest)
-            }
-
-            var intToTest = 43
-            let _ = try await client.execute(uri: "/user/\(intToTest)", method: .get) { response in
-                #expect(response.status == .ok)
-                #expect(String(buffer: response.body) == "\(intToTest)")
-            }
-
-            intToTest = 43131
-            let _ = try await client.execute(uri: "/user/\(intToTest)", method: .get) { response in
-                #expect(response.status == .ok)
-                #expect(String(buffer: response.body) == "\(intToTest)")
-            }
-
-            intToTest = -13214
-            let name = "some crazy string"
-            let _ = try await client.execute(uri: "/user/\(intToTest)/\(name)", method: .get) { response in
-                #expect(response.status == .ok)
-                #expect(String(buffer: response.body) == "found \(name) for \(intToTest)")
-            }
-        }
-    }
-
-    struct MiniCodable:Decodable, ResponseEncodable {
-        let number: Int
-        let phrase: String?
-    }
-
-    @Test func testDecoding() async throws {
-        let app = try await buildApplication(TestArguments())
-        try await app.test(.router) { client in
-        
-            let _ = try await client.execute(uri: "/decodable/default", method: .post) { response in
-                #expect(response.status == .badRequest, "not the status expected from an empty post")
-            }
-
-            let codedData = MiniCodable(number: 34, phrase:"something to say")
-
-            var buffer = try JSONEncoder().encodeAsByteBuffer(codedData, allocator: ByteBufferAllocator())
-            // print("coded: \(String(buffer:buffer))")
-            // var buffer = ByteBuffer(string: "{\"phrase\":\"something to say\",\"number\":34}" )
-            let _ = try await client.execute(uri: "/decodable/default", method: .post, body:buffer) { response in
-                #expect(response.status == .ok)
-                print("responseBody default: \(String(buffer: response.body))")
-
-                //json shows up in arbitrary order, so check for values individually.
-
-				//responseBody looks like
-				//"DECODED: MiniCodable(number: 34, phrase: Optional("something to say"))").contains("\"number\":\(codedData.number)"
-                #expect(String(buffer: response.body).contains("number: \(codedData.number)"))
-                #expect(String(buffer: response.body).contains("phrase: \"Optional(\(codedData.phrase!))\""))
-            }
-
-            
-            buffer = ByteBuffer(string: "number=\(codedData.number)&phrase=\(codedData.phrase!)")
-            let _ = try await client.execute(uri: "/decodable/form", 
-                                            method: .post, 
-                                            //need header if detecting based on header, which not yet.
-                                            //headers: [.contentType: "application/x-www-form-urlencoded"], 
-                                            body:buffer) { response in
-                #expect(response.status == .ok)
-                print("responseBody form: \(String(buffer: response.body))")
-                #expect(String(buffer: response.body).contains("\"number\":\(codedData.number)"))
-                //THIS TEST FAILS b/c Optional()
-                #expect(String(buffer: response.body).contains("\"phrase\":\"\(codedData.phrase!)\""))
-            }
-        }
-    }
-
-//     @discardableResult
-// func execute<Return>(
-//     uri: String,
-//     method: HTTPRequest.Method,
-//     headers: HTTPFields = [:],
-//     body: ByteBuffer? = nil,
-//     testCallback: @escaping (TestResponse) async throws -> Return = { $0 }
-// ) async throws -> Return
-
 }
