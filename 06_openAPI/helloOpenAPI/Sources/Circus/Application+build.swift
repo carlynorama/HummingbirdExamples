@@ -50,7 +50,7 @@ func buildRouter() throws -> Router<AppRequestContext> {
         OpenAPIRequestContextMiddleware()
     }
     // Add OpenAPI handlers
-    let api = APIImplementation()
+    let api = ClownAPIHandler()
     try api.registerHandlers(on: router)
     return router
 }
