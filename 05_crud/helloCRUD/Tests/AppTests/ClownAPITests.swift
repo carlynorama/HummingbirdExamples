@@ -90,24 +90,6 @@ extension AppTests {
       }
     }
 
-    struct DeleteRequest: Encodable {
-      let id: Int
-      let name: String
-
-    }
-
-    static func formDelete(id: Int, name: String, client: some TestClientProtocol) async throws
-      -> HTTPResponse.Status
-    {
-      let request = DeleteRequest(id: id, name: name)
-      let buffer = ByteBuffer(string: try URLEncodedFormEncoder().encode(request))
-      return try await client.execute(uri: "/clowns/form/leave", method: .post, body: buffer) {
-        response in
-        #expect(response.status == .ok)
-        return response.status
-      }
-    }
-
     static func deleteAll(client: some TestClientProtocol) async throws -> HTTPResponse.Status {
       try await client.execute(uri: "/clowns", method: .delete) { response in
         response.status
@@ -233,27 +215,33 @@ extension AppTests {
 
     //	//TODO: test the nose
     //
-    //    @Test func testUpdateNoses() async throws {
-    //      let app = try await buildApplication(TestArguments())
-    //
-    //      try await app.test(.router) { client in
-    //        let knownGoodID = 4
-    //        let newNoseCount = 18
-    //        let beforeClown = try await Self.get(id: knownGoodID, client: client)
-    //        //client.execute(uri: "/clowns/honk", method: .post)
-    //        // let clown = try await Self.patch(id: knownGoodID, spareNoses: newNoseCount, client: client)
-    //        // #expect(clown != nil)
-    //        // #expect(clown!.spareNoses == newNoseCount )
-    //        // #expect(clown!.name == beforeClown?.name )
-    //        // #expect(clown!.spareNoses != beforeClown?.spareNoses)
-    //        // #expect(clown!.id == beforeClown?.id)
-    //
-    //        // let retrievedClown = try await Self.get(id: clown!.id, client: client)
-    //        // #expect(clown == retrievedClown)
-    //        // let retrievedOrigIDClown = try await Self.get(id: knownGoodID, client: client)
-    //        // #expect(retrievedClown == retrievedOrigIDClown)
-    //      }
-    //    }
+       @Test func testNoseDecrement() async throws {
+         let app = try await buildApplication(TestArguments())
+    
+         try await app.test(.router) { client in
+           let knownGoodID = 1
+           let beforeClown = try await Self.get(id: knownGoodID, client: client)
+           #expect(beforeClown != nil)
+           let replyClown:Clown? = try await client.execute(uri: "clowns/\(knownGoodID)/honk", method: .patch) { response in 
+              // either the get request returned an 200 status or it didn't return a Clown
+              //#expect(response.status == .ok || response.body.readableBytes == 0)
+              if response.body.readableBytes > 0 {
+                // print(String(buffer: response.body))
+                return try JSONDecoder().decode(Clown.self, from: response.body)
+              } else {
+                // print("empty body?")
+                // print(response)
+                return nil
+              }
+          }
+          
+           #expect(replyClown != nil)
+           #expect(replyClown!.name == beforeClown?.name )
+           #expect(replyClown!.spareNoses != beforeClown?.spareNoses)
+           #expect(replyClown!.spareNoses + 1 == beforeClown?.spareNoses)
+           #expect(replyClown!.id == beforeClown?.id)
+         }
+       }
 
     @Test func testUpdateName() async throws {
       let app = try await buildApplication(TestArguments())

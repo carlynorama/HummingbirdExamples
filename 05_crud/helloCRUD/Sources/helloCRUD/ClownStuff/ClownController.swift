@@ -19,6 +19,7 @@ public struct ClownController: Sendable {
       .get(use: list)
       .post(use: create)
       .patch(":id", use: update)
+      .patch("{id}/honk", use: noseDecrement)
       .delete(":id", use: delete)
       .delete(use: deleteAll)
     return routes
@@ -66,7 +67,7 @@ public struct ClownController: Sendable {
         spareNoses: requestValue.spareNoses
       )
     else {
-      throw HTTPError(.badRequest)
+      throw HTTPError(.badRequest, message:"repository did not update clown")
     }
     return clown
   }
@@ -78,11 +79,10 @@ public struct ClownController: Sendable {
   @Sendable func noseDecrement(request: Request, context: some RequestContext) async throws
     -> Clown?
   {
-    let honkRequest = try await request.decode(as: HonkRequest.self, context: context)
-    //let id = try context.parameters.require("id", as: Int.self)
-    if let beforeClown = try await self.repository.get(id: honkRequest.id) {
+    let honkRequestID = try context.parameters.require("id", as: Int.self)
+    if let beforeClown = try await self.repository.get(id: honkRequestID) {
       return try await self.repository.update(
-        id: honkRequest.id, name: nil, spareNoses: beforeClown.spareNoses - 1)
+        id: honkRequestID, name: nil, spareNoses: beforeClown.spareNoses - 1)
     }
     return nil
   }
