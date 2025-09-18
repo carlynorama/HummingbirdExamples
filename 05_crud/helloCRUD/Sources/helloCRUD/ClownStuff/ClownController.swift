@@ -25,16 +25,6 @@ public struct ClownController: Sendable {
     return routes
   }
 
-  /// Get clown endpoint
-  @Sendable func get(request: Request, context: some RequestContext) async throws -> Clown? {
-    let id = try context.parameters.require("id", as: Int.self)
-    return try await self.repository.get(id: id)
-  }
-
-  /// Get list of clowns endpoint
-  @Sendable func list(request: Request, context: some RequestContext) async throws -> [Clown] {
-    return try await self.repository.list()
-  }
 
   struct CreateRequest: Decodable {
     let name: String
@@ -51,6 +41,20 @@ public struct ClownController: Sendable {
       name: request.name, spareNoses: request.spareNoses ?? 10)
     return EditedResponse(status: .created, response: clown)
   }
+  
+  /// Get clown endpoint
+  @Sendable func get(request: Request, context: some RequestContext) async throws -> Clown? {
+    let id = try context.parameters.require("id", as: Int.self)
+    do {
+    	return try await self.repository.get(id: id)
+    }
+  }
+
+  /// Get list of clowns endpoint
+  @Sendable func list(request: Request, context: some RequestContext) async throws -> [Clown] {
+    return try await self.repository.list()
+  }
+
 
   struct UpdateRequest: Decodable {
     let name: String?
