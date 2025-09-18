@@ -1,6 +1,9 @@
 import Hummingbird
 import Logging
+
 import OpenAPIHummingbird
+import OpenAPIRuntime
+import ClownAPI
 
 /// Application arguments protocol. We use a protocol so we can call
 /// `buildApplication` inside Tests as well as in the App executable. 
@@ -49,8 +52,25 @@ func buildRouter() throws -> Router<AppRequestContext> {
         // store request context in TaskLocal
         OpenAPIRequestContextMiddleware()
     }
-    // Add OpenAPI handlers
-    let api = ClownAPIHandler()
-    try api.registerHandlers(on: router)
+    
+    router.get("/ping") { _, _ -> HTTPResponse.Status in
+        return .ok
+    }
+
+    let repository = ClownCar()
+    let clown_api = ClownAPIHandler(repository: repository)
+    do {
+        print(try Servers.Server1.url())
+        let url = try Servers.Server1.url()
+
+        //ErrorHandlingMiddleware API is part of OpenAPIRuntime
+        //registerHandlers will pull the .path() from the URL 
+        try clown_api.registerHandlers(on: router, serverURL: url) 
+        //middlewares: [ErrorHandlingMiddleware()])
+    } catch {
+        //LOG THIS
+        print("hello api failed to register. Those endpoints will not be available.")
+    }
+
     return router
 }

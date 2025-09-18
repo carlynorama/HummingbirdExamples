@@ -1,18 +1,232 @@
-openapi: '3.1.0'
+openapi: 3.1.0
 info:
-  title: AppService
-  version: 1.0.0
+  title: Clown API
+  description: "Where are the clowns? Send in the clowns."
+  version: 0.1.0
+
 servers:
-  - url: https://example.com/api
-    description: App service deployment.
+  - url: http://localhost:{port}{basePath}
+    description: Local Testing
+    variables:
+      port:
+        enum:
+          - "8080"
+          - "2525"
+        default: "8080"
+      basePath:
+        default: /api/v0/clowns
+
+# The routes on your API
 paths:
-  /:
+  /hello:
     get:
-      operationId: getHello
+      operationId: greet
       responses:
         '200':
-          description: Hello!
+          description: A hello message as a string
           content:
             text/plain:
               schema:
                 type: string
+  /helloworld:
+    get:
+      operationId: greetFormally
+      responses:
+        "200": # When the request is successful
+          description: A JSON formatted hello message
+          content:
+            application/json:
+              schema: # The returned JSON object
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+  /test_clown:
+    # GET /test_clown
+    get:
+      operationId: testClown
+      responses:
+        "200": # When the request is successful
+          description: A basic clown profile.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Clown"
+  /:
+    get:
+      operationId: list
+      responses:
+        "200": # When the request is successful
+          description: A successful retrieval of a list of clowns.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Clown"
+    post:
+      operationId: create
+      requestBody:
+        description: a clown to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClownCreateRequest"
+      responses:
+        "200":
+          description: Successful creation with the clown returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Clown"
+        "201":
+          description: Successful creation with the id number returned
+          content:
+            application/json:
+              schema: # The returned JSON object
+                type: object
+                properties:
+                  id:
+                    type: integer
+                required:
+                  - id
+        "204":
+          description: Successful creation with empty body
+        "400":
+          description: Some bad request.  
+    delete:
+      operationId: deleteAll
+      responses:
+        "200":
+          description: Successfully deleted all the clowns.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        "400":
+          description: Was not able to delete the clowns or already there were no clowns. 
+          content:
+            text/plain:
+              schema:
+                type: string
+  /{id}:
+    get:      
+      operationId: fetchByID
+      parameters:
+        - name: id
+          in: path
+          description: Clown ID
+          required: true
+          schema:
+            type: integer
+            # format: int64
+      responses:
+        "200": # When the request is successful
+          description: Clown JSON object retrieved from ID number.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Clown"
+        "404":
+          description: Item not found in database
+          content:
+            text/plain:
+              schema:
+                type: string
+    patch:
+      operationId: update
+      parameters:
+        - name: id
+          in: path
+          description: Clown ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: update a clown
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClownUpdateRequest"
+      responses:
+        "200":
+          description: Successfully updated the clown.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Clown"
+        "400":
+          description: Was not able to update the clown.
+          content:
+            text/plain:
+              schema:
+                type: string
+
+    delete:
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          description: Clown ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successfully deleted the clown returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Clown"
+        "400":
+          description: Was not able to delete the clown or clown already did not exist.
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  schemas:
+    #   let id: Int
+    #   var name: String
+    #   var spareNoses: Int
+    Clown:
+      type: object
+      description: A single clown profile.
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        spareNoses:
+          type: integer
+      required:
+        - id
+        - spareNoses
+        - name
+    ClownCreateRequest:
+      type: object
+      description: Fields to try to create a clown from.
+      properties:
+        name:
+          type: string
+        spareNoses:
+          type: integer
+      required:
+        - name
+    ClownUpdateRequest:
+      type: object
+      description: Fields one can use to update a Clown. 
+      properties:
+        name:
+          type: string
+        spareNoses:
+          type: integer

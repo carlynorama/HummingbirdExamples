@@ -1,24 +1,35 @@
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
+import Foundation
+#endif
+
 import Hummingbird
 import HummingbirdTesting
 import Logging
-import XCTest
+import Testing
 
-@testable import App
 
-final class AppTests: XCTestCase {
+
+
+@testable import circusServer
+
+struct AppTests {
     struct TestArguments: AppArguments {
+        let nameTag: String = "nwtTestServer"
         let hostname = "127.0.0.1"
         let port = 0
         let logLevel: Logger.Level? = .trace
     }
 
-    func testApp() async throws {
-        let args = TestArguments()
-        let app = try await buildApplication(args)
+    
+    @Test func testCreateApp() async throws {
+        let app = try await buildApplication(TestArguments())
         try await app.test(.router) { client in
-            try await client.execute(uri: "/", method: .get) { response in
-                XCTAssertEqual(response.body, ByteBuffer(string: "Hello!"))
+            let _ = try await client.execute(uri: "/ping", method: .get) { response in
+                #expect(response.status == .ok)
             }
         }
     }
+    
 }
