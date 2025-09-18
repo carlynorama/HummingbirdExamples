@@ -135,6 +135,7 @@ extension AppTests {
 
         let badID = 53_253_622  //change to known unused value
         let _ = try await client.execute(uri: "/clowns/\(badID)", method: .get) { response in
+          //bad interpretation of a nil
           #expect(response.status == .noContent)
         }
 
@@ -200,6 +201,7 @@ extension AppTests {
         let newName = "Bozo Jr."
         let newNoseCount = 18
         let _ = try await client.execute(uri: "/clowns/\(knownBadID)", method: .get) { response in
+          //bad interpretation of a nil
           #expect(response.status == .noContent)
         }
         var updateStatus = try await Self.patchResponseStatus(
@@ -275,6 +277,7 @@ extension AppTests {
         let status = try await Self.delete(id: knownGoodID, client: client)
         #expect(status == .ok)
         try await client.execute(uri: "/clowns/\(knownGoodID)", method: .get) { response in
+          //bad interpretation of a nil
           #expect(response.status == .noContent)
         }
         try await client.execute(uri: "/clowns/\(knownGoodID)", method: .delete) { response in
@@ -294,6 +297,7 @@ extension AppTests {
         let status = try await Self.deleteAll(client: client)
         #expect(status == .ok)
         try await client.execute(uri: "/clowns/\(knownGoodID)", method: .get) { response in
+          //bad interpretation of a nil
           #expect(response.status == .noContent)
         }
         try await client.execute(uri: "/clowns/\(knownGoodID)", method: .delete) { response in
