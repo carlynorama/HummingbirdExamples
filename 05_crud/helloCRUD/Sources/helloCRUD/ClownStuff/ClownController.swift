@@ -25,6 +25,7 @@ public struct ClownController: Sendable {
     return routes
   }
 
+  // CREATE
 
   struct CreateRequest: Decodable {
     let name: String
@@ -41,12 +42,14 @@ public struct ClownController: Sendable {
       name: request.name, spareNoses: request.spareNoses ?? 10)
     return EditedResponse(status: .created, response: clown)
   }
-  
+
+  // READ
+
   /// Get clown endpoint
   @Sendable func get(request: Request, context: some RequestContext) async throws -> Clown? {
     let id = try context.parameters.require("id", as: Int.self)
     do {
-    	return try await self.repository.get(id: id)
+      return try await self.repository.get(id: id)
     }
   }
 
@@ -55,6 +58,7 @@ public struct ClownController: Sendable {
     return try await self.repository.list()
   }
 
+  // UPDATE
 
   struct UpdateRequest: Decodable {
     let name: String?
@@ -71,7 +75,7 @@ public struct ClownController: Sendable {
         spareNoses: requestValue.spareNoses
       )
     else {
-      throw HTTPError(.badRequest, message:"repository did not update clown")
+      throw HTTPError(.badRequest, message: "repository did not update clown")
     }
     return clown
   }
@@ -90,6 +94,8 @@ public struct ClownController: Sendable {
     }
     return nil
   }
+
+  // DELETE
 
   /// Delete clown endpoint
   @Sendable func delete(request: Request, context: some RequestContext) async throws
@@ -112,4 +118,3 @@ public struct ClownController: Sendable {
   }
 
 }
-
