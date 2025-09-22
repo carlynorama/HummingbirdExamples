@@ -346,7 +346,6 @@ extension AppTests {
           #expect(response.status == .badRequest)
         }
       }
-
     }
 
     @Test func testDeleteAll() async throws {

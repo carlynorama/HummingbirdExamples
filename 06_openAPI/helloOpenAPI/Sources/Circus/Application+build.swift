@@ -10,6 +10,7 @@ import ClownAPI
 /// Any variables added here also have to be added to `App` in App.swift and 
 /// `TestArguments` in AppTest.swift
 public protocol AppArguments {
+    var nameTag:String { get }
     var hostname: String { get }
     var port: Int { get }
     var logLevel: Logger.Level? { get }
@@ -23,7 +24,7 @@ typealias AppRequestContext = BasicRequestContext
 public func buildApplication(_ arguments: some AppArguments) async throws -> some ApplicationProtocol {
     let environment = Environment()
     let logger = {
-        var logger = Logger(label: "ballet")
+        var logger = Logger(label: arguments.nameTag)
         logger.logLevel = 
             arguments.logLevel ??
             environment.get("LOG_LEVEL").flatMap { Logger.Level(rawValue: $0) } ??
@@ -35,7 +36,7 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
         router: router,
         configuration: .init(
             address: .hostname(arguments.hostname, port: arguments.port),
-            serverName: "ballet"
+            serverName: arguments.nameTag
         ),
         logger: logger
     )
@@ -63,12 +64,11 @@ func buildRouter() throws -> Router<AppRequestContext> {
         print(try Servers.Server1.url())
         let url = try Servers.Server1.url()
 
-        //ErrorHandlingMiddleware API is part of OpenAPIRuntime
-        //registerHandlers will pull the .path() from the URL 
         try clown_api.registerHandlers(on: router, serverURL: url) 
-        //middlewares: [ErrorHandlingMiddleware()])
+
     } catch {
-        //LOG THIS
+        //handle this situation. 
+        
         print("hello api failed to register. Those endpoints will not be available.")
     }
 

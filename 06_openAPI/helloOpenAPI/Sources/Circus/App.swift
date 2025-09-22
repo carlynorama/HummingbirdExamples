@@ -4,6 +4,8 @@ import Logging
 
 @main
 struct AppCommand: AsyncParsableCommand, AppArguments {
+    var nameTag: String = "circusServer"
+
     @Option(name: .shortAndLong)
     var hostname: String = "127.0.0.1"
 

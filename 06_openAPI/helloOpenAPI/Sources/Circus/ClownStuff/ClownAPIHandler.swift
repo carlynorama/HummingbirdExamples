@@ -10,33 +10,44 @@ extension Components.Schemas.Clown {
 }
 
 struct ClownAPIHandler: APIProtocol {
-    // func getHello(_ input: ClownAPI.Operations.GetHello.Input) async throws -> ClownAPI.Operations.GetHello.Output {
-    //     return .ok(.init(body: .plainText("Hello!")))
-    // }
-
-
     let repository: ClownCar
 
     func greet(_ input: Operations.Greet.Input) async throws -> Operations.Greet.Output {
-        // 1.
-        return .ok(.init(body: .plainText("Hello!")))
+        //return .ok(.init(body: .plainText("Hello!")))
+        let message = "Hello!"
+        let httpBody = OpenAPIRuntime.HTTPBody(message.utf8)
+        let OkBody = Operations.Greet.Output.Ok.Body.plainText(httpBody)
+        let greetOk = Operations.Greet.Output.Ok(body: OkBody)
+        let greetOutput = Operations.Greet.Output.ok(greetOk)
+        return greetOutput
     }
 
     func greetFormally(_ input: Operations.GreetFormally.Input) async throws -> Operations.GreetFormally.Output {
-        // 1.
-        return .ok(.init(body:
-            // 2.
-            .json(.init(
-                // 3
-                message: "Hello, world!"
-            ))
-        ))
+        let jsonPayload = Operations.GreetFormally.Output.Ok.Body.JsonPayload(message: "Hello, world!")
+        let greetFormallyOkBody = Operations.GreetFormally.Output.Ok.Body.json(jsonPayload)
+        let greetFormallyOk = Operations.GreetFormally.Output.Ok(body: greetFormallyOkBody)
+        let greetFormallyOutput = Operations.GreetFormally.Output.ok(greetFormallyOk)
+        return greetFormallyOutput
+
+        // return .ok(.init(body:
+        //     .json(.init(
+        //         message: "Hello, world!"
+        //     ))
+        // ))
     }
+
+    // func greetFormally(_ input: Operations.GreetFormally.Input) async throws -> Operations.GreetFormally.Output {
+    //     //undocumented(statusCode: Swift.Int, OpenAPIRuntime.UndocumentedPayload)
+    //     let message = "Not right now thanks."
+    //     let httpBody = OpenAPIRuntime.HTTPBody(message.utf8)
+    //     return .undocumented(statusCode: 418, .init(headerFields: .init(dictionaryLiteral: []), body: httpBody))
+    // }
 
     func testClown(_ input:Operations.TestClown.Input) async throws -> Operations.TestClown.Output {
         let clown = Clown(id: 144214, name:"Polka Dot" , spareNoses: 56)
         //see extension above.
-        return .ok(.init(body: .json(.init(clown:clown))))
+        let myClown = Components.Schemas.Clown(clown: clown)
+        return .ok(.init(body: .json(myClown)))
     }
 
     func create(_ input:Operations.Create.Input) async throws -> Operations.Create.Output {
@@ -100,6 +111,7 @@ struct ClownAPIHandler: APIProtocol {
     }
 
     func deleteAll(_ input: Operations.DeleteAll.Input) async throws -> Operations.DeleteAll.Output {
+    
         try await self.repository.deleteAll()
         return .ok(.init(body: .json(.init(message: "All deleted!"))))
     }

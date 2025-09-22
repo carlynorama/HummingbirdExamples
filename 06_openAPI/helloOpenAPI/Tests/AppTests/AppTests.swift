@@ -16,7 +16,7 @@ import Testing
 
 struct AppTests {
     struct TestArguments: AppArguments {
-        let nameTag: String = "nwtTestServer"
+        let nameTag: String = "openAPITestServer"
         let hostname = "127.0.0.1"
         let port = 0
         let logLevel: Logger.Level? = .trace
