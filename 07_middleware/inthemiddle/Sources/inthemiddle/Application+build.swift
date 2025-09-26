@@ -51,6 +51,8 @@ func buildRouter() async throws -> Router<AppRequestContext> {
         LogRequestsMiddleware(.info)
         //custom middleware for both request and response header logging
         LogHeadersMiddleware(level: .info)
+        //Serves static 404 pages
+        Static404Middleware()
         //serves the static files in public folder by default.
         FileMiddleware(searchForIndexHtml: true)
     }
