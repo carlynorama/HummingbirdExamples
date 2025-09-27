@@ -23,9 +23,9 @@ public struct LogHeadersMiddleware<Context: RequestContext>: RouterMiddleware {
         let response = try await next(request, context)
 
         let responseHeaders = formatHeaderForLog(headers: response.headers)
-        context.logger.log(level: level, Logger.Message(stringLiteral: "\nResponding with:\n\(responseHeaders)"))
+        let status = response.status
+        context.logger.log(level: level, Logger.Message(stringLiteral: "\nResponding \(status) with:\n\(responseHeaders)"))
 
         return response
     }
-
 }
