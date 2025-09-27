@@ -45,11 +45,11 @@ public func buildApplication(_ arguments: some AppArguments) async throws
 func buildRouter() async throws -> Router<AppRequestContext> {
   let router = Router(context: AppRequestContext.self)
   let mustacheLibrary = try await MustacheLibrary(directory: Bundle.module.resourcePath!)
-  let errorTemplate = mustacheLibrary.getTemplate(named: "error")!
+  //let errorTemplate = mustacheLibrary.getTemplate(named: "error")!
 
   router.addMiddleware {
     //Mustache based error page.
-    ErrorPageMiddleware(errorTemplate: errorTemplate, mustacheLibrary: mustacheLibrary)
+    ErrorPageMiddleware(mustacheLibrary: mustacheLibrary)
 
     //built in logger.
     LogRequestsMiddleware(.info)

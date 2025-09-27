@@ -6,7 +6,6 @@ import Mustache
 
 /// Generate an HTML page for a thrown error
 struct ErrorPageMiddleware<Context: RequestContext>: RouterMiddleware {
-    let errorTemplate: MustacheTemplate
     let mustacheLibrary: MustacheLibrary
 
     func handle(

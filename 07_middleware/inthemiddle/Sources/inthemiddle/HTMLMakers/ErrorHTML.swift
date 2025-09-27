@@ -16,8 +16,6 @@ struct ErrorInfo {
 }
 
 struct ErrorHTML:ResponseGenerator  {
-    // load mustache template library
-
     let message: String
     let status: HTTPResponse.Status
 
@@ -27,6 +25,7 @@ struct ErrorHTML:ResponseGenerator  {
         self.message = message
         self.status = status
         self.library = library
+        //should potentially confirm that an error template exists. 
     }
 
     private var html:String {
