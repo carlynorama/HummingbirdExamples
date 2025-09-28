@@ -1,18 +1,19 @@
 import Hummingbird
 
 protocol ForwardingRequestContext: RequestContext {
-    var timeConsumingData: Int? { get set }
-    var noteToPass: String?  { get set }
+  var noteToPass: String? { get set }
+  var timeConsumingData: Int? { get set }
 }
 
 public struct MyForwardingContext: ForwardingRequestContext {
-    public var coreContext: CoreRequestContextStorage
-    public var timeConsumingData: Int?
-    public var noteToPass: String?
+  public var coreContext: CoreRequestContextStorage
 
-    public init(source: Source) {
-        self.coreContext = .init(source: source)
-        self.timeConsumingData = nil
-        self.noteToPass = nil
-    }
+  public var noteToPass: String?
+  public var timeConsumingData: Int?
+
+  public init(source: Source) {
+    self.coreContext = .init(source: source)
+    self.noteToPass = nil
+    self.timeConsumingData = nil
+  }
 }

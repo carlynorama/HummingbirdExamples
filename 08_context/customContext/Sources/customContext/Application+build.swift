@@ -40,7 +40,8 @@ public func buildApplication(_ arguments: some AppArguments) async throws
 
 }
 
-struct ContextInfo: ResponseEncodable {
+//Decodable for testing. 
+struct ContextInfo: ResponseEncodable, Decodable {
   let timeConsumingData: Int?
   let noteToPass: String?
   let maxUploadSize: Int
@@ -73,8 +74,8 @@ func buildRouter() async throws -> Router<AppRequestContext> {
   }
 
   //http://localhost:8080/contextSpy/anythingHere
-  //"parameters": ... elements: [(key: \"id\", value: \"anythingHere\")] ...
-  router.get("contextSpy/{id}") { _, context -> ContextInfo in
+  //"parameters": ... elements: [(key: \"number\", value: \"anythingHere\")] ...
+  router.get("contextSpy/{number}") { _, context -> ContextInfo in
     ContextInfo(
       timeConsumingData: context.timeConsumingData,
       noteToPass: context.noteToPass,
@@ -84,18 +85,17 @@ func buildRouter() async throws -> Router<AppRequestContext> {
       request_id: context.id)
   }
 
-  //http://localhost:8080/urlQueryCheck?x=45&y=33
-  //prints to the terminal, does not show up in parameters
-  router.get("urlQueryCheck") { request, context -> ContextInfo in
-    print(request.uri.queryParameters)
-    return ContextInfo(
-      timeConsumingData: context.timeConsumingData,
-      noteToPass: context.noteToPass,
-      maxUploadSize: context.maxUploadSize,
-      endpointPath: context.endpointPath,
-      parameters: "\(context.parameters)",
-      request_id: context.id)
-  }
+
+
+  let subRoutes = router.group("kiddiePool", context: RCJunior.self) 
+  subRoutes.get { _, context -> String in
+        print("child route without \"number\"")
+        return "CODE: \(context.magicNumber)"
+    }
+  subRoutes.get("{number}")  { _, context -> String in
+        print("child route with \"number\"")
+        return "CODE: \(context.magicNumber)"
+    }
 
   return router
 }

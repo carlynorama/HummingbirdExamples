@@ -19,8 +19,6 @@ let package = Package(
                 .product(name: "Mustache", package: "swift-mustache"),
                 .product(name: "HummingbirdRouter", package: "hummingbird"),
             ],
-            resources: [.process("Templates")]
-
         ),
         .testTarget(name: "addTestingTests",
             dependencies: [
