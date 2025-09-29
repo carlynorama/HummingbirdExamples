@@ -69,6 +69,14 @@ struct AppTests {
     @Test func testKiddiePool() async throws {
         let app = try await buildApplication(TestArguments())
         
+        //base, nothing else
+        try await app.test(.router) { client in
+            let _ = try await client.execute(uri: "/kiddiePool/", method: .get) { response in
+                print(response.status)
+                #expect(response.status.code == 418)
+            }
+        }
+
         //with number
         let number = 65
         try await app.test(.router) { client in
@@ -89,13 +97,37 @@ struct AppTests {
             }
         }
 
-        //base, nothing else
+        //undefined route
         try await app.test(.router) { client in
-            let _ = try await client.execute(uri: "/kiddiePool/", method: .get) { response in
+            let _ = try await client.execute(uri: "/kiddiePool/notANumber/and/too/much/else", method: .get) { response in
+                print(response.status)
+                #expect(response.status == .notFound)
+            }
+        }
+
+        //magic path success
+        let magicNumber = 3
+        try await app.test(.router) { client in
+            let _ = try await client.execute(uri: "/kiddiePool/magic/\(magicNumber)/rabbit/saw/cards", method: .get) { response in
+                print(response.status)
+                #expect(response.status == .ok)
+                let decoded = String(bytes: response.body.readableBytesView, encoding: .utf8 )
+                #expect(decoded != nil)
+                let expectedTotal =  2+732+magicNumber
+                #expect(decoded == "CODE: \(expectedTotal)")
+            }
+        }
+
+        //magic path no number
+        try await app.test(.router) { client in
+            let _ = try await client.execute(uri: "/kiddiePool/magic/notANumber/rabbit/saw/cards", method: .get) { response in
                 print(response.status)
                 #expect(response.status.code == 418)
             }
         }
+
     }
+
+
 
 }
